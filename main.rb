@@ -4,8 +4,9 @@ require("byebug")
 require_relative("./lib/app")
 require_relative("./lib/app/logger")
 
+App::Logger.set_level(:debug)
+
 app = App.new(
-  target_hand_count: 200,
-  logger: App::Logger.new(log_level: :debug),
+  target_hand_count: 1000,
 )
 app.run
