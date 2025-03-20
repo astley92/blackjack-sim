@@ -10,11 +10,13 @@ class App
   def initialize(target_hand_count:)
     @hand_count = 0
     @target_hand_count = target_hand_count
+    # TODO: Pass deck config (deck count, penetration, etc)
     @dealer = App::Dealer.new
     @house_bank = 100_000_00
   end
 
   def run
+    # TODO: Create some different player strategies
     seats = [
       App::Seat.new(player: App::Player.new(name: "Blake")),
       App::Seat.new(player: App::Player.new(name: "Joe")),
@@ -22,6 +24,7 @@ class App
 
     while running?
       @hand_count += 1
+      # TODO: Write to file
       App::Logger.debug("Playing hand ##{@hand_count}")
 
       # Reset cards and place bets
@@ -41,18 +44,18 @@ class App
       end
 
       # Player action
+      # TODO: Allow double, split, insurance, surrender
       seats.each do |seat|
         while true
-          player_score = App::HandCalculator.call(seat.hand)
-          seat.score = player_score
-          App::Logger.debug("#{seat.player} has #{player_score} (#{seat.hand})")
+          seat.score = App::HandCalculator.call(seat.hand)
+          App::Logger.debug("#{seat.player} has #{seat.score} (#{seat.hand})")
 
-          if player_score.bust?
+          if seat.bust?
             App::Logger.debug("#{seat.player} bust!")
             break
           end
 
-          player_action = seat.player.next_action(player_score, dealer_hand[0])
+          player_action = seat.player.next_action(seat.score, dealer_hand[0])
           if player_action == App::Player::Actions::STAND
             App::Logger.debug("#{seat.player} has stood")
             break
@@ -69,6 +72,7 @@ class App
       App::Logger.debug("Dealer shows - #{dealer_hand} for #{dealer_score.to_s}")
 
       unless seats.all? { |seat| seat.bust? }
+        # TODO: Handle soft 17
         while dealer_score.value < 17
           dealer_hand += @dealer.deal
           dealer_score = App::HandCalculator.call(dealer_hand)
