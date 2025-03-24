@@ -2,16 +2,13 @@
 
 class App
   class Player
-    module Actions
-      STAND = :stand
-      HIT = :hit
-    end
-
     attr_accessor :bank
-    def initialize(name:)
+
+    def initialize(name:, strategy:)
       @current_hand = nil
       @name = name
       @bank = 0
+      @strategy = strategy
     end
 
     def set_current_hand(hand)
@@ -19,7 +16,7 @@ class App
     end
 
     def next_action(hand, dealer_card)
-      [1, 2].shuffle[0] == 1 ? Actions::STAND : Actions::HIT
+      @strategy.decision(hand, dealer_card)
     end
 
     def place_bet

@@ -47,6 +47,10 @@ class App
       def >(other)
         other.value < value
       end
+
+      def ==(other)
+        @value == other.value
+      end
     end
   end
 end

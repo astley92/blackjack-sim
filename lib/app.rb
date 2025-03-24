@@ -1,12 +1,19 @@
 # frozen_string_literal: true
 
-require_relative("./app/seat")
-require_relative("./app/dealer")
-require_relative("./app/player")
-require_relative("./app/hand")
-require_relative("./app/hand_calculator")
+require_relative("app/seat")
+require_relative("app/dealer")
+require_relative("app/player")
+require_relative("app/hand")
+require_relative("app/hand_calculator")
+require_relative("app/strategies/random")
+require_relative("app/strategies/stander")
 
 class App
+  module PlayerActions
+    HIT = :hit
+    STAND = :stand
+  end
+
   def initialize(target_hand_count:)
     @hand_count = 0
     @target_hand_count = target_hand_count
@@ -18,8 +25,8 @@ class App
   def run
     # TODO: Create some different player strategies
     seats = [
-      App::Seat.new(player: App::Player.new(name: "Blake")),
-      App::Seat.new(player: App::Player.new(name: "Joe")),
+      App::Seat.new(player: App::Player.new(name: "Random", strategy: App::Strategies::Random)),
+      App::Seat.new(player: App::Player.new(name: "Stander", strategy: App::Strategies::Stander))
     ]
 
     while running?
@@ -56,7 +63,7 @@ class App
           end
 
           player_action = seat.player.next_action(seat.score, dealer_hand[0])
-          if player_action == App::Player::Actions::STAND
+          if player_action == PlayerActions::STAND
             App::Logger.debug("#{seat.player} has stood")
             break
           end
@@ -69,14 +76,14 @@ class App
       # Dealer action
       App::Logger.debug("---------")
       dealer_score = App::HandCalculator.call(dealer_hand)
-      App::Logger.debug("Dealer shows - #{dealer_hand} for #{dealer_score.to_s}")
+      App::Logger.debug("Dealer shows - #{dealer_hand} for #{dealer_score}")
 
-      unless seats.all? { |seat| seat.bust? }
+      unless seats.all?(&:bust?)
         # TODO: Handle soft 17
         while dealer_score.value < 17
           dealer_hand += @dealer.deal
           dealer_score = App::HandCalculator.call(dealer_hand)
-          App::Logger.debug("Dealer draws to #{dealer_score.to_s}")
+          App::Logger.debug("Dealer draws to #{dealer_score}")
         end
       end
 
@@ -90,6 +97,7 @@ class App
 
         if seat.score == dealer_score
           App::Logger.debug("Player #{seat.player} ties with dealer")
+          seat.player.bank += seat.bet_amount
           next
         end
 
