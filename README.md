@@ -11,11 +11,10 @@ strategies against different deck configurations.
 
 # Notes
 
-## Seat to Player to Hand relationship
-A table has many seats
-A seat is occupied by one player
-A seat is dealt one hand
+## Player to Hand relationship
+A table has many players
+A player is dealt one hand
 That hand can turn into multiple in the case of splits
-Each hand is paid at the end
+Money is exchanged for each hand is paid at the end of a round of play
 
 ## Strategy setup

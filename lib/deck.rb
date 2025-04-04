@@ -3,6 +3,8 @@
 class Deck
   include Enumerable
 
+  attr_reader :cards
+
   def initialize
     @cards = []
     Card::RANKS.each do |rank|
@@ -18,6 +20,16 @@ class Deck
 
   def shift
     @cards.shift
+  end
+
+  def shuffle
+    @cards.shuffle!
+  end
+
+  def merge(other)
+    raise ArgumentError, "Expected #{self.class.name} got #{other.class.name}" unless other.instance_of?(self.class)
+
+    @cards += other.cards
   end
 
   class Card
@@ -39,7 +51,7 @@ class Deck
     RANKS = RANK_VALUE_MAP.keys.freeze
     SUITS = %w[H C D S].freeze
 
-    attr_reader :rank, :suit
+    attr_reader :rank, :suit, :value
     def initialize(rank, suit)
       @rank = rank
       @suit = suit
