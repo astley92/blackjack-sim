@@ -2,7 +2,7 @@
 
 require_relative("boot")
 
-HAND_COUNT = 10000
+HAND_COUNT = 1_000
 DECK_COUNT = 2
 
 deck = Deck.new
@@ -33,16 +33,18 @@ HAND_COUNT.times do |i|
   end
 
   # player actions
-  hands.each do |hand|
-    while !hand.bust? && hand.owner.next_action(hand, {}) != Actions::STAND
-      hand.add_card(deck.shift)
+  unless dealer_hand.blackjack?
+    hands.each do |hand|
+      while !hand.bust? && hand.owner.next_action(hand, {}) != Actions::STAND
+        hand.add_card(deck.shift)
+      end
     end
-  end
 
-  # dealer actions
-  if hands.any? { !_1.bust? }
-    while !dealer_hand.bust? && dealer.next_action(dealer_hand, {}) != Actions::STAND
-      dealer_hand.add_card(deck.shift)
+    # dealer actions
+    if hands.any? { !_1.bust? }
+      while !dealer_hand.bust? && dealer.next_action(dealer_hand, {}) != Actions::STAND
+        dealer_hand.add_card(deck.shift)
+      end
     end
   end
 
@@ -50,33 +52,47 @@ HAND_COUNT.times do |i|
 
   # cash dispersal
   hands.each do |hand|
-    if hand.bust?
-      puts "BUST: #{hand.value} - #{hand}"
-    elsif dealer_hand.bust?
+    result = HandComparison.call(player_hand: hand, dealer_hand: dealer_hand)
+
+    case result
+    when HandComparison::Results::PLAYER_WIN
       puts "WON : #{hand.value} - #{hand}"
       hand.owner.balance += hand.bet_amount * 2
-    elsif hand.value < dealer_hand.value
+    when HandComparison::Results::PLAYER_LOSS
       puts "LOST: #{hand.value} - #{hand}"
-    elsif hand.value > dealer_hand.value
-      puts "WON : #{hand.value} - #{hand}"
-      hand.owner.balance += hand.bet_amount * 2
-    else
+    when HandComparison::Results::PLAYER_BLACKJACK
+      puts "BKJK: #{hand.value} - #{hand}"
+      hand.owner.balance += hand.bet_amount * 2.5
+    when HandComparison::Results::BLACKJACK_PUSH
+      puts "BJPS: #{hand.value} - #{hand}"
+      hand.owner.balance += hand.bet_amount
+    when HandComparison::Results::TIE
       puts "TIE : #{hand.value} - #{hand}"
       hand.owner.balance += hand.bet_amount
     end
+    # if hand.bust?
+    #   puts "BUST: #{hand.value} - #{hand}"
+    # elsif dealer_hand.bust? || hand.value > dealer_hand.value
+    #   puts "WON : #{hand.value} - #{hand}"
+    #   hand.owner.balance += hand.bet_amount * 2
+    # elsif hand.value < dealer_hand.value
+    #   puts "LOST: #{hand.value} - #{hand}"
+    # else
+    #   puts "TIE : #{hand.value} - #{hand}"
+    #   hand.owner.balance += hand.bet_amount
+    # end
   end
 
   puts "-------------------\n\n"
   # check if marker was seen
   # build new deck if it was
-  if deck.count < 30
-    deck = Deck.new
-    (DECK_COUNT - 1).times do
-      deck.merge(Deck.new)
-    end
-    deck.shuffle
-  end
+  next unless deck.count < 30
 
+  deck = Deck.new
+  (DECK_COUNT - 1).times do
+    deck.merge(Deck.new)
+  end
+  deck.shuffle
 end
 
 players.each do |player|

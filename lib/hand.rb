@@ -41,6 +41,10 @@ class Hand
     false
   end
 
+  def blackjack?
+    value == 21 && @cards.count == 2
+  end
+
   def bust?
     value > 21
   end
