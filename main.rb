@@ -2,7 +2,7 @@
 
 require_relative("boot")
 
-HAND_COUNT = 1_000
+HAND_COUNT = 100_000
 DECK_COUNT = 2
 
 deck = Deck.new
@@ -13,9 +13,8 @@ deck.shuffle
 
 dealer = Player.new(strategy: Strategies::StandardDealer)
 players = []
-players << Player.new(strategy: Strategies::StandardDealer)
-players << Player.new(strategy: Strategies::StandardDealer)
-players << Player.new(strategy: Strategies::StandardDealer)
+players << Player.new(strategy: Strategies::StandardPlayer)
+players << Player.new(strategy: Strategies::DoublePlayer)
 
 HAND_COUNT.times do |i|
   puts "--- HAND #{i + 1} ---"
@@ -35,8 +34,19 @@ HAND_COUNT.times do |i|
   # player actions
   unless dealer_hand.blackjack?
     hands.each do |hand|
-      while !hand.bust? && hand.owner.next_action(hand, {}) != Actions::STAND
-        hand.add_card(deck.shift)
+      while !hand.bust?
+        action = hand.owner.next_action(hand, {})
+        break if action == Actions::STAND
+
+        if action == Actions::DOUBLE
+          puts "PLAYER DOUBLING"
+          hand.owner.balance -= hand.bet_amount
+          hand.bet_amount += hand.bet_amount
+          hand.add_card(deck.shift)
+          break
+        else
+          hand.add_card(deck.shift)
+        end
       end
     end
 
@@ -70,17 +80,6 @@ HAND_COUNT.times do |i|
       puts "TIE : #{hand.value} - #{hand}"
       hand.owner.balance += hand.bet_amount
     end
-    # if hand.bust?
-    #   puts "BUST: #{hand.value} - #{hand}"
-    # elsif dealer_hand.bust? || hand.value > dealer_hand.value
-    #   puts "WON : #{hand.value} - #{hand}"
-    #   hand.owner.balance += hand.bet_amount * 2
-    # elsif hand.value < dealer_hand.value
-    #   puts "LOST: #{hand.value} - #{hand}"
-    # else
-    #   puts "TIE : #{hand.value} - #{hand}"
-    #   hand.owner.balance += hand.bet_amount
-    # end
   end
 
   puts "-------------------\n\n"
@@ -96,5 +95,5 @@ HAND_COUNT.times do |i|
 end
 
 players.each do |player|
-  puts "Player finished with: #{player.balance}"
+  puts "#{player.strategy.name} finished with: #{player.balance}"
 end

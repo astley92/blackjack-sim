@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Player
+  attr_accessor :strategy
   attr_accessor :balance
 
   def initialize(strategy:)
@@ -9,7 +10,7 @@ class Player
   end
 
   def bet_amount
-    50
+    10
   end
 
   def next_action(hand, context)

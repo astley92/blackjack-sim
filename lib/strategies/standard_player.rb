@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-# Dealer hits until 17 or better
-# Dealer hits soft 17
+# Hits until 17 or better
+# Hits soft 17
 
-module Strategies::StandardDealer
+module Strategies::StandardPlayer
   module_function
 
   def name
-    "Standard Dealer"
+    "Standard Player"
   end
 
   def next_action(hand, _)

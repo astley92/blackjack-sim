@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Hand
-  attr_reader :owner, :bet_amount
+  attr_reader :owner
+  attr_accessor :bet_amount
+
   def initialize(owner:, bet_amount: nil)
     @owner = owner
     @bet_amount = bet_amount
@@ -51,5 +53,9 @@ class Hand
 
   def to_s
     @cards.map(&:to_s).join(", ")
+  end
+
+  def count
+    @cards.count
   end
 end

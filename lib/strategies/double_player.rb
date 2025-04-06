@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
-# Dealer hits until 17 or better
-# Dealer hits soft 17
+# Hits until 17 or better
+# Hits soft 17
+# Doubles 11's
 
-module Strategies::StandardDealer
+module Strategies::DoublePlayer
   module_function
 
   def name
-    "Standard Dealer"
+    "Double Player"
   end
 
   def next_action(hand, _)
+    return Actions::DOUBLE if hand.count == 2 && hand.value == 11
     return Actions::HIT if hand.value < 17
     return Actions::HIT if hand.value == 17 && hand.soft?
 
