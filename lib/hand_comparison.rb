@@ -11,17 +11,17 @@ module HandComparison
 
   def self.call(player_hand:, dealer_hand:)
     if player_hand.blackjack? && dealer_hand.blackjack?
-      Results::BLACKJACK_PUSH
+      return Results::BLACKJACK_PUSH
     elsif player_hand.blackjack?
-      Results::PLAYER_BLACKJACK
+      return Results::PLAYER_BLACKJACK
     elsif player_hand.bust?
-      Results::PLAYER_LOSS
+      return Results::PLAYER_LOSS
     elsif dealer_hand.bust? || player_hand.value > dealer_hand.value
-      Results::PLAYER_WIN
+      return Results::PLAYER_WIN
     elsif player_hand.value == dealer_hand.value
-      Results::TIE
-    else
-      Results::PLAYER_LOSS
+      return Results::TIE
     end
+
+    Results::PLAYER_LOSS
   end
 end

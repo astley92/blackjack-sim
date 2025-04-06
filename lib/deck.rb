@@ -46,12 +46,13 @@ class Deck
       "5" => 5,
       "4" => 4,
       "3" => 3,
-      "2" => 2,
+      "2" => 2
     }.freeze
     RANKS = RANK_VALUE_MAP.keys.freeze
     SUITS = %w[H C D S].freeze
 
     attr_reader :rank, :suit, :value
+
     def initialize(rank, suit)
       @rank = rank
       @suit = suit

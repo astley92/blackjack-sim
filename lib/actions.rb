@@ -4,4 +4,5 @@ module Actions
   HIT = :hit
   STAND = :stand
   DOUBLE = :double
+  SPLIT = :split
 end

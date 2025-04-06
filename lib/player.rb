@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class Player
-  attr_accessor :strategy
-  attr_accessor :balance
+  attr_accessor :strategy, :balance
 
   def initialize(strategy:)
     @strategy = strategy

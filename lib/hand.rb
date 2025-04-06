@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Hand
-  attr_reader :owner
+  attr_reader :owner, :cards
   attr_accessor :bet_amount
 
   def initialize(owner:, bet_amount: nil)
